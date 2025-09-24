@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Progresso do Presente 💝</title>
+  <style>
+    body { font-family: Arial; text-align: center; margin-top: 50px; background: #ffe6f0; }
+    .progress-container { width: 80%; background: #eee; margin: 20px auto; border-radius: 20px; overflow: hidden; }
+    .progress-bar { height: 30px; background: #ff5c8d; width: 0%; color: white; line-height: 30px; text-align: center; transition: width 0.5s; }
+    input, button { padding: 8px 12px; margin-top: 15px; border-radius: 8px; border: 1px solid #ccc; }
+    button { background: #ff5c8d; color: white; border: none; cursor: pointer; }
+    button:hover { background: #e64b79; }
+  </style>
+</head>
+<body>
+
+  <h1>🎁 Progresso do Presente 🎁</h1>
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar">0%</div>
+  </div>
+  <div id="infoText">Falta 100% para ficar pronto 💖</div>
+
+  <div>
+    <input type="number" id="progressInput" min="0" max="100" placeholder="0-100">
+    <button onclick="atualizarProgresso()">Atualizar</button>
+  </div>
+
+  <script>
+    async function carregarProgresso() {
+      const res = await fetch('/progresso');
+      const data = await res.json();
+      atualizarBarra(data.valor);
+    }
+
+    async function atualizarProgresso() {
+      const input = document.getElementById('progressInput');
+      let valor = parseInt(input.value);
+      if (isNaN(valor) || valor < 0) valor = 0;
+      if (valor > 100) valor = 100;
+
+      await fetch('/progresso', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ valor })
+      });
+
+      atualizarBarra(valor);
+    }
+
+    function atualizarBarra(valor) {
+      const barra = document.getElementById('progressBar');
+      const info = document.getElementById('infoText');
+
+      barra.style.width = valor + '%';
+      barra.textContent = valor + '%';
+      info.textContent = valor < 100 ? `Já concluí ${valor}%, falta ${100 - valor}% 💖` : 'Presente concluído! 🎉💝';
+    }
+
+    carregarProgresso();
+  </script>
+
+</body>
+</html>
